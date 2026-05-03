@@ -1,74 +1,110 @@
-# Booking Widget — Self-Hosted Calendar Booking
+# 📅 Booking Widget — Free Calendar Bookings for Your Website
 
-A lightweight, zero-cost alternative to Calendly. Embed in any website with a single `<script>` tag.
+Replace Calendly with **zero cost**, **zero monthly fees**, and **full control**.
 
-**Features:**
-- 📅 Reads availability from Google Calendar
-- 🎨 Light/dark themes
-- 📱 Mobile responsive
-- 🔗 Single-line embed
-- 📊 Source tracking (knows which page generated each booking)
-- ✉️ Confirmation emails via Resend
-- 🎥 Google Meet integration
-- ⚡ Fast (Netlify Functions, <500ms response)
+Your website visitors can book time on your calendar in seconds. Meetings appear in Google Calendar automatically. Confirmation emails sent automatically.
 
-**Live demo:** https://book.scottmagnacca.com
+[![Deploy with Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/smagnacca/booking-widget)
 
 ---
 
-## Quick Start
+## ⭐ What It Does
 
-### 1. Embed on Your Site
+✅ Visitors see **available time slots** from your Google Calendar  
+✅ They **pick a time** and enter their email  
+✅ Meeting **appears in your Google Calendar** instantly  
+✅ **Confirmation email** sent to them (with calendar invite)  
+✅ Works on **phone, tablet, desktop**  
+✅ **Light & dark themes** — matches your site  
+✅ **Tracks source** — know which page generated each booking  
+
+---
+
+## 🚀 Deploy in 5 Minutes (No Code, No Terminal)
+
+**Click the button above** ☝️
+
+Then:
+1. Paste 2 API keys (copy/paste from Google & Resend)
+2. Click "Deploy"
+3. Done!
+
+👉 **[See step-by-step guide →](DEPLOY-GUIDE.md)** (super simple, web-only, no terminal)
+
+---
+
+## 💻 Embed on Your Website
+
+Once deployed, add this to any page:
 
 ```html
 <script src="https://book.scottmagnacca.com/widget.js"></script>
 
-<div id="scott-booking-widget"
-     data-type="30"
-     data-theme="dark"
+<div id="scott-booking-widget" 
+     data-type="30" 
+     data-theme="dark" 
      data-source="your-site">
 </div>
 ```
 
-That's it! The widget will:
-1. Load available slots from Google Calendar
-2. Let visitors select a time
-3. Create calendar event + send confirmation email
+**That's it.** Widget appears instantly.
 
-### 2. Customize
+---
 
-**Meeting duration:**
+## 🎨 Customize
+
+Change meeting length:
 ```html
-data-type="15"  <!-- 15-minute meetings -->
-data-type="30"  <!-- 30-minute meetings (default) -->
+data-type="15"    <!-- 15-minute calls -->
+data-type="30"    <!-- 30-minute calls -->
 ```
 
-**Theme:**
+Change color theme:
 ```html
-data-theme="light"  <!-- Light background (default) -->
-data-theme="dark"   <!-- Dark background -->
+data-theme="light"    <!-- Light background -->
+data-theme="dark"     <!-- Dark background -->
 ```
 
-**Source tracking:**
+Track which site generated the booking:
 ```html
-data-source="salesforlife"    <!-- Tracks which site generated booking -->
-data-source="60-second-quiz"
-data-source="babson"
+data-source="salesforlife"
+data-source="home-page"  
+data-source="quiz-funnel"
 ```
 
 ---
 
-## Setup
+## 💰 Cost Breakdown
 
-See `SETUP.md` for complete setup instructions (Google OAuth2, Resend, Netlify, DNS).
+| Service | Cost |
+|---------|------|
+| Netlify (hosting) | **Free** |
+| Google Calendar (API) | **Free** |
+| Resend (email) | **Free** (100/month) |
+| Custom domain (optional) | ~$12/year |
+| **TOTAL** | **Free - $12/year** |
 
-**TL;DR:**
-1. Create Google Cloud project + enable Calendar API
-2. Generate OAuth2 credentials (refresh token)
-3. Sign up for Resend (free email)
-4. Deploy to Netlify
-5. Point custom subdomain DNS
-6. Embed on your sites
+*Calendly costs $10-16/month. This saves you $120-192/year.*
+
+---
+
+## 📚 Documentation
+
+- **[Deployment Guide](DEPLOY-GUIDE.md)** ← Start here (no terminal!)
+- **[Technical Setup](SETUP.md)** — Detailed instructions
+- **[API Reference](README.md#-api-endpoints)** — For developers
+
+---
+
+## 🔧 What's Included
+
+- Self-hosted booking widget (JavaScript + CSS)
+- Google Calendar integration (free API)
+- Email confirmations (Resend)
+- Light/dark themes
+- Mobile responsive
+- Source tracking
+- Google Meet auto-generation
 
 ---
 

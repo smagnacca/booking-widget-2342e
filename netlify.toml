@@ -25,3 +25,15 @@
     "Content-Type" = "text/css; charset=utf-8"
     "Access-Control-Allow-Origin" = "*"
     "Cache-Control" = "public, max-age=3600"
+
+# Environment variables for Deploy with Netlify button
+[env.production]
+  GOOGLE_CLIENT_ID = ""
+  GOOGLE_CLIENT_SECRET = ""
+  GOOGLE_REFRESH_TOKEN = ""
+  GOOGLE_CALENDAR_ID = "scott.magnacca1@gmail.com"
+  CALENDAR_TIMEZONE = "America/New_York"
+  RESEND_API_KEY = ""
+  CONFIRMATION_EMAIL_FROM = "bookings@book.scottmagnacca.com"
+  WIDGET_HOST = "https://book.scottmagnacca.com"
+  MAX_ADVANCE_DAYS = "30"
