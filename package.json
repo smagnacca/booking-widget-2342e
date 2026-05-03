@@ -1,0 +1,24 @@
+{
+  "name": "booking-widget",
+  "version": "1.0.0",
+  "description": "Self-hosted embeddable calendar booking widget for Google Calendar",
+  "type": "module",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "googleapis": "^118.0.0",
+    "google-auth-library": "^9.0.0",
+    "resend": "^3.0.0",
+    "dotenv": "^16.0.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  },
+  "scripts": {
+    "dev": "netlify functions:serve",
+    "build": "npm run build:functions",
+    "build:functions": "echo 'Functions ready for Netlify'",
+    "test": "echo 'Test suite placeholder'"
+  }
+}

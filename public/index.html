@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Booking Widget Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #ffffff;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .header h1 {
+      font-size: 40px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #f5a623, #00d4ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      font-size: 16px;
+      opacity: 0.7;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .demo-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+    }
+
+    .demo-section h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      opacity: 0.8;
+    }
+
+    .embed-code {
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 20px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 12px;
+      overflow-x: auto;
+      color: #00d4ff;
+    }
+
+    .status {
+      background: rgba(0, 212, 255, 0.1);
+      border-left: 4px solid #00d4ff;
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    .footer {
+      text-align: center;
+      opacity: 0.6;
+      font-size: 13px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .header h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Booking Widget Demo</h1>
+      <p>Self-hosted calendar booking widget for Scott Magnacca. Embed on any website with a single script tag.</p>
+    </div>
+
+    <div class="demo-grid">
+      <div class="demo-section">
+        <h2>Light Theme (15-min)</h2>
+        <div id="scott-booking-widget-1" data-type="15" data-theme="light" data-source="demo-light"></div>
+        <div class="embed-code">
+&lt;script src="https://book.scottmagnacca.com/widget.js"&gt;&lt;/script&gt;
+&lt;div id="scott-booking-widget"
+     data-type="15"
+     data-theme="light"
+     data-source="demo"&gt;
+&lt;/div&gt;
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Dark Theme (30-min)</h2>
+        <div id="scott-booking-widget-2" data-type="30" data-theme="dark" data-source="demo-dark"></div>
+        <div class="embed-code">
+&lt;script src="https://book.scottmagnacca.com/widget.js"&gt;&lt;/script&gt;
+&lt;div id="scott-booking-widget"
+     data-type="30"
+     data-theme="dark"
+     data-source="demo"&gt;
+&lt;/div&gt;
+        </div>
+      </div>
+    </div>
+
+    <div class="status">
+      <strong>Status:</strong> Widget is in development. OAuth2 credentials needed before live use.
+      <br/>See <code>SETUP.md</code> for Google Cloud Console configuration.
+    </div>
+
+    <div class="footer">
+      <p>© 2026 Scott Magnacca | booking-widget.netlify.app</p>
+    </div>
+  </div>
+
+  <!-- Load the widget script -->
+  <script src="/widget.js"></script>
+</body>
+</html>

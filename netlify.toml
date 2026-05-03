@@ -1,0 +1,27 @@
+[build]
+  command = "npm run build"
+  functions = "netlify/functions"
+  publish = "public"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+[dev]
+  command = "netlify functions:serve"
+  port = 8888
+
+[[headers]]
+  for = "/widget.js"
+  [headers.values]
+    "Content-Type" = "application/javascript; charset=utf-8"
+    "Access-Control-Allow-Origin" = "*"
+    "Cache-Control" = "public, max-age=3600"
+
+[[headers]]
+  for = "/widget.css"
+  [headers.values]
+    "Content-Type" = "text/css; charset=utf-8"
+    "Access-Control-Allow-Origin" = "*"
+    "Cache-Control" = "public, max-age=3600"
