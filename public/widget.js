@@ -34,38 +34,37 @@
       </div>
 
       <div class="booking-widget__content">
-        <div class="booking-widget__step" id="step-slots">
+        <div class="booking-widget__step" data-step="slots">
           <label>Select a Time</label>
           <div class="booking-widget__loading">
             <div class="spinner"></div> Loading available times...
           </div>
-          <div class="booking-widget__slots" id="slots-container"></div>
+          <div class="booking-widget__slots" data-role="slots-container"></div>
         </div>
 
-        <div class="booking-widget__step hidden" id="step-details">
+        <div class="booking-widget__step hidden" data-step="details">
           <label>Your Details</label>
           <input
             type="text"
-            id="visitor-name"
+            data-role="visitor-name"
             placeholder="Full Name"
             class="booking-widget__input"
           />
           <input
             type="email"
-            id="visitor-email"
+            data-role="visitor-email"
             placeholder="Email Address"
             class="booking-widget__input"
           />
-          <div class="booking-widget__selected-slot" id="selected-slot-display"></div>
-          <button id="confirm-booking" class="booking-widget__button">Confirm Booking</button>
-          <button id="back-to-slots" class="booking-widget__button booking-widget__button--secondary">Back</button>
+          <div class="booking-widget__selected-slot" data-role="selected-slot-display"></div>
+          <button data-role="confirm-booking" class="booking-widget__button">Confirm Booking</button>
         </div>
 
-        <div class="booking-widget__step hidden" id="step-confirmation">
+        <div class="booking-widget__step hidden" data-step="confirmation">
           <div class="booking-widget__success">
             <div class="checkmark">✓</div>
             <h4>Meeting Confirmed!</h4>
-            <p id="confirmation-message"></p>
+            <p data-role="confirmation-message"></p>
             <p class="booking-widget__small">Check your email for details and calendar invite.</p>
           </div>
         </div>
@@ -78,6 +77,9 @@
     // Append to container
     container.appendChild(widget);
 
+    // Helper to query within widget only
+    const q = (selector) => widget.querySelector(selector);
+
     // Bind event listeners
     let selectedSlot = null;
 
@@ -85,22 +87,16 @@
     fetchAvailableSlots(timezone, meetingType).then((slots) => {
       renderSlots(slots, (slot) => {
         selectedSlot = slot;
-        showStep('step-details');
-        document.getElementById('selected-slot-display').textContent =
+        showStep('details');
+        q('[data-role="selected-slot-display"]').textContent =
           `Selected: ${new Date(slot.isoTime).toLocaleString()}`;
       });
     });
 
-    // Back button
-    document.getElementById('back-to-slots')?.addEventListener('click', () => {
-      showStep('step-slots');
-      selectedSlot = null;
-    });
-
     // Confirm booking
-    document.getElementById('confirm-booking')?.addEventListener('click', async () => {
-      const name = document.getElementById('visitor-name').value;
-      const email = document.getElementById('visitor-email').value;
+    q('[data-role="confirm-booking"]')?.addEventListener('click', async () => {
+      const name = q('[data-role="visitor-name"]').value;
+      const email = q('[data-role="visitor-email"]').value;
 
       if (!name || !email) {
         alert('Please enter your name and email.');
@@ -128,7 +124,10 @@
       };
 
       try {
-        document.getElementById('confirm-booking').disabled = true;
+        const confirmBtn = q('[data-role="confirm-booking"]');
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Processing...';
+
         const response = await fetch(BOOKING_ENDPOINT, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -137,26 +136,77 @@
 
         const result = await response.json();
 
-        if (result.success) {
-          document.getElementById('confirmation-message').innerHTML =
+        if (response.ok && result.success) {
+          q('[data-role="confirmation-message"]').innerHTML =
             `Your meeting is confirmed for <strong>${startTime.toLocaleString()}</strong>.<br/>A confirmation email has been sent to ${email}.`;
-          showStep('step-confirmation');
+          showStep('confirmation');
         } else {
-          alert('Failed to create booking. Please try again.');
-          document.getElementById('confirm-booking').disabled = false;
+          const errorMsg = result.error || 'Failed to create booking. Please try again.';
+          alert(errorMsg);
+          confirmBtn.disabled = false;
+          confirmBtn.textContent = 'Confirm Booking';
         }
       } catch (error) {
         console.error('Booking error:', error);
-        alert('Error creating booking. Please try again.');
-        document.getElementById('confirm-booking').disabled = false;
+        alert('Error creating booking. Please check your connection and try again.');
+        const confirmBtn = q('[data-role="confirm-booking"]');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirm Booking';
       }
     });
 
-    function showStep(stepId) {
-      widget.querySelectorAll('.booking-widget__step').forEach((step) => {
+    function showStep(stepName) {
+      widget.querySelectorAll('[data-step]').forEach((step) => {
         step.classList.add('hidden');
       });
-      document.getElementById(stepId)?.classList.remove('hidden');
+      widget.querySelector(`[data-step="${stepName}"]`)?.classList.remove('hidden');
+    }
+
+    function renderSlots(data, onSelectSlot) {
+      const container = q('[data-role="slots-container"]');
+      container.innerHTML = '';
+
+      if (!data.slots || data.slots.length === 0) {
+        container.innerHTML = '<p class="booking-widget__error">No availability. Please try again later.</p>';
+        return;
+      }
+
+      const slotsByDate = {};
+      data.slots.forEach((slot) => {
+        if (!slotsByDate[slot.date]) slotsByDate[slot.date] = [];
+        slotsByDate[slot.date].push(slot);
+      });
+
+      Object.entries(slotsByDate).forEach(([date, slots]) => {
+        const dateGroup = document.createElement('div');
+        dateGroup.className = 'booking-widget__date-group';
+
+        const dateLabel = document.createElement('div');
+        dateLabel.className = 'booking-widget__date-label';
+        dateLabel.textContent = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
+        });
+        dateGroup.appendChild(dateLabel);
+
+        const timesContainer = document.createElement('div');
+        timesContainer.className = 'booking-widget__times';
+
+        slots.forEach((slot) => {
+          const button = document.createElement('button');
+          button.className = 'booking-widget__time-slot';
+          button.textContent = slot.time;
+          button.addEventListener('click', () => onSelectSlot(slot));
+          timesContainer.appendChild(button);
+        });
+
+        dateGroup.appendChild(timesContainer);
+        container.appendChild(dateGroup);
+      });
+
+      // Remove loading state
+      widget.querySelector('.booking-widget__loading')?.remove();
     }
   }
 
@@ -170,53 +220,6 @@
       console.error('Error fetching slots:', error);
       return { slots: [] };
     }
-  }
-
-  function renderSlots(data, onSelectSlot) {
-    const container = document.getElementById('slots-container');
-    container.innerHTML = '';
-
-    if (!data.slots || data.slots.length === 0) {
-      container.innerHTML = '<p class="booking-widget__error">No availability. Please try again later.</p>';
-      return;
-    }
-
-    const slotsByDate = {};
-    data.slots.forEach((slot) => {
-      if (!slotsByDate[slot.date]) slotsByDate[slot.date] = [];
-      slotsByDate[slot.date].push(slot);
-    });
-
-    Object.entries(slotsByDate).forEach(([date, slots]) => {
-      const dateGroup = document.createElement('div');
-      dateGroup.className = 'booking-widget__date-group';
-
-      const dateLabel = document.createElement('div');
-      dateLabel.className = 'booking-widget__date-label';
-      dateLabel.textContent = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-      });
-      dateGroup.appendChild(dateLabel);
-
-      const timesContainer = document.createElement('div');
-      timesContainer.className = 'booking-widget__times';
-
-      slots.forEach((slot) => {
-        const button = document.createElement('button');
-        button.className = 'booking-widget__time-slot';
-        button.textContent = slot.time;
-        button.addEventListener('click', () => onSelectSlot(slot));
-        timesContainer.appendChild(button);
-      });
-
-      dateGroup.appendChild(timesContainer);
-      container.appendChild(dateGroup);
-    });
-
-    // Remove loading state
-    document.querySelector('.booking-widget__loading')?.remove();
   }
 
   function injectStyles(theme) {
@@ -385,6 +388,7 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.2s ease;
+        margin: 0;
       }
 
       .booking-widget__button:hover {
@@ -395,17 +399,6 @@
       .booking-widget__button:disabled {
         opacity: 0.6;
         cursor: not-allowed;
-      }
-
-      .booking-widget__button--secondary {
-        background: ${hoverColor};
-        color: ${textColor};
-        border: 1px solid ${borderColor};
-        margin-top: 8px;
-      }
-
-      .booking-widget__button--secondary:hover {
-        background: ${borderColor};
       }
 
       .booking-widget__success {
