@@ -103,9 +103,11 @@ export const handler = async (event: any): Promise<any> => {
       subject: `Meeting Confirmed — ${startTime.toLocaleDateString()}`,
       html: generateConfirmationEmail(
         body.visitorName,
+        body.visitorEmail,
         startTime,
         body.meetingType,
-        response.data.hangoutLink || ''
+        response.data.hangoutLink || '',
+        body.source || 'direct'
       ),
     });
 
@@ -136,9 +138,11 @@ export const handler = async (event: any): Promise<any> => {
 
 function generateConfirmationEmail(
   visitorName: string,
+  visitorEmail: string,
   startTime: Date,
   duration: string,
-  hangoutLink: string
+  hangoutLink: string,
+  source: string
 ): string {
   const endTime = new Date(startTime);
   endTime.setMinutes(endTime.getMinutes() + parseInt(duration));
@@ -152,8 +156,15 @@ function generateConfirmationEmail(
       <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
         <p><strong>Date & Time:</strong> ${startTime.toLocaleString()}</p>
         <p><strong>Duration:</strong> ${duration} minutes</p>
-        ${hangoutLink ? `<p><strong>Video Call:</strong> <a href="${hangoutLink}">${hangoutLink}</a></p>` : ''}
+        <p><strong>Confirmation sent to:</strong> ${visitorEmail}</p>
+        ${hangoutLink ? `<p><strong>Video Call:</strong> <a href="${hangoutLink}">Join Meeting</a></p>` : ''}
       </div>
+
+      <p style="color: #666; font-size: 12px; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 15px;">
+        <strong>Booking Details:</strong><br>
+        Source: ${source}<br>
+        Booked: ${new Date().toLocaleString()}
+      </p>
 
       <p>A calendar invitation has been sent to your email. You can also add it to your calendar directly.</p>
 
