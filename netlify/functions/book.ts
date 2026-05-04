@@ -97,19 +97,25 @@ export const handler = async (event: any): Promise<any> => {
     const startTime = new Date(body.startTime);
 
     // Send confirmation email via Resend
-    await resend.emails.send({
-      from: process.env.CONFIRMATION_EMAIL_FROM || 'bookings@book.scottmagnacca.com',
-      to: body.visitorEmail,
-      subject: `Meeting Confirmed — ${startTime.toLocaleDateString()}`,
-      html: generateConfirmationEmail(
-        body.visitorName,
-        body.visitorEmail,
-        startTime,
-        body.meetingType,
-        response.data.hangoutLink || '',
-        body.source || 'direct'
-      ),
-    });
+    try {
+      const emailResponse = await resend.emails.send({
+        from: process.env.CONFIRMATION_EMAIL_FROM || 'bookings@book.scottmagnacca.com',
+        to: body.visitorEmail,
+        subject: `Meeting Confirmed — ${startTime.toLocaleDateString()}`,
+        html: generateConfirmationEmail(
+          body.visitorName,
+          body.visitorEmail,
+          startTime,
+          body.meetingType,
+          response.data.hangoutLink || '',
+          body.source || 'direct'
+        ),
+      });
+      console.log('Email sent:', emailResponse);
+    } catch (emailError: any) {
+      console.error('Email send failed:', emailError?.message || String(emailError));
+      // Don't fail the booking if email fails — event is already created
+    }
 
     return {
       statusCode: 200,
