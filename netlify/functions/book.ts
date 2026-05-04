@@ -99,7 +99,7 @@ export const handler = async (event: any): Promise<any> => {
     // Send confirmation email via Resend
     try {
       const emailResponse = await resend.emails.send({
-        from: process.env.CONFIRMATION_EMAIL_FROM || 'bookings@book.scottmagnacca.com',
+        from: process.env.CONFIRMATION_EMAIL_FROM || 'onboarding@resend.dev',
         to: body.visitorEmail,
         subject: `Meeting Confirmed — ${startTime.toLocaleDateString()}`,
         html: generateConfirmationEmail(
