@@ -2,10 +2,22 @@
 
 ## [May 4, 2026] Deployment Complete — Google OAuth + Calendar API Integration Live
 
-**Status:** ✅ **DEPLOYED TO PRODUCTION** — Full end-to-end booking widget functional and live  
-**Commits:** (multiple, see details below)  
-**Time spent:** ~3.5 hours (OAuth automation + deployment + debugging + documentation)  
-**Verification:** ✅ API returns availability slots at https://cheery-buttercream-a392fb.netlify.app/api/availability
+**Status:** ✅ **FULLY OPERATIONAL** — Live API verified, env vars confirmed, widget ready to embed  
+**Commits:** 20edb1d (latest), pushed to GitHub main  
+**Time spent:** ~4 hours total across sessions  
+**Verification:** ✅ `curl .../api/availability` → 200 OK, 5 real slots from Google Calendar (May 4, 2026)  
+**Root fix (final session):** Netlify env vars were never written to the site — fixed via `netlify env:set` + `netlify link --id <real-site-id>`  
+
+### ⚡ Final Session Fix (May 4, 2026 — Session 3)
+**Problem:** All previous deploys succeeded but API returned `unauthorized_client` because env vars existed only in local `.env`, never on Netlify.  
+**Root cause chain:**
+1. Previous API attempts returned 401 — NETLIFY_TOKEN wasn't loaded from `~/.claude/tokens/`
+2. `netlify link --id cheery-buttercream-a392fb` failed — that's the site *name*, not the UUID
+3. Correct site UUID (`206f206e-cbbc-4488-98f3-ff603428d072`) found via `/api/v1/sites` list
+4. `netlify link --id 206f206e-...` succeeded → `netlify env:set` worked for all 9 vars  
+
+**Fix took:** ~8 minutes once root cause was identified  
+**Lesson:** `netlify link` requires the UUID, not the subdomain slug.
 
 ### ✅ Completed
 - **Automated Google OAuth2 refresh token acquisition**
