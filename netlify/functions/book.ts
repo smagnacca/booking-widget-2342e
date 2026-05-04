@@ -81,7 +81,7 @@ export const handler = async (event: any): Promise<any> => {
       conferenceData: {
         createRequest: {
           requestId: `${Date.now()}`,
-          conferenceSolutionKey: { conferenceSolution: 'hangoutsMeet' },
+          conferenceSolutionKey: { type: 'hangoutsMeet' },
         },
       },
     };
@@ -121,7 +121,7 @@ export const handler = async (event: any): Promise<any> => {
         confirmationUrl: response.data.htmlLink,
       } as BookingResponse),
     };
-  } catch (error) {
+  } catch (error: any) {
     console.error('Booking error:', error);
     return {
       statusCode: 500,
