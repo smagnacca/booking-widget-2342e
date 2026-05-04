@@ -1,8 +1,110 @@
 # Changelog — Booking Widget
 
+## [May 4, 2026] Deployment Complete — Google OAuth + Calendar API Integration Live
+
+**Status:** ✅ **DEPLOYED TO PRODUCTION** — Full end-to-end booking widget functional and live  
+**Commits:** (multiple, see details below)  
+**Time spent:** ~3.5 hours (OAuth automation + deployment + debugging + documentation)  
+**Verification:** ✅ API returns availability slots at https://cheery-buttercream-a392fb.netlify.app/api/availability
+
+### ✅ Completed
+- **Automated Google OAuth2 refresh token acquisition**
+  - Created Node.js OAuth server script (`get-refresh-token.mjs`) that runs locally on port 3000
+  - Script builds Google OAuth consent URL with offline access + calendar scope
+  - User clicks one URL → authorizes → server captures code → exchanges for refresh token
+  - Token saved to `.refresh_token.txt` (destroyed after use)
+  - **Why this approach:** Browser automation was fragile; local server is more reliable
+- **Set environment variables on Netlify production site**
+  - Used Netlify API to configure all 9 required env vars (CLIENT_ID, SECRET, REFRESH_TOKEN, etc.)
+  - Env vars stored securely in Netlify, not in code or git
+- **Deployed to Netlify production**
+  - Compiled TypeScript functions to JavaScript
+  - Cleared function cache to force fresh bundling
+  - Pushed to `cheery-buttercream-a392fb.netlify.app`
+  - DNS CNAME ready for `book.scottmagnacca.com`
+- **End-to-end verification**
+  - ✅ Local test: Node.js script calls `calendar.freebusy.query()` → returns 20 available slots
+  - ✅ Live API test: `curl https://cheery-buttercream-a392fb.netlify.app/api/availability` → 200 OK with slots
+
+### 🚨 Problems Found (And How We Fixed Them)
+
+#### Problem #1: OAuth 2.0 Browser Automation Failure
+**Symptom:** Attempted to use Chrome extension to navigate Google OAuth Playground, but hit browser tier restrictions (read-only mode blocks clicks)  
+**Root Cause:** OAuth Playground UI requires filling form fields, which requires unrestricted browser control. Chrome extension restricts typing/clicking to avoid security issues.  
+**Impact:** Blocked deployment for ~30 minutes  
+**Resolution:** Built custom Node.js OAuth server instead of relying on external tools. Server:
+- Creates local HTTP endpoint on port 3000
+- Listens for Google's callback with authorization code
+- Exchanges code for tokens via Google token endpoint
+- Requires only ONE user action: click the authorization URL in browser  
+**Lesson:** Custom OAuth servers are more reliable than browser automation + external tools. Build lightweight local servers for one-off auth flows instead of trying to automate third-party UIs.
+
+#### Problem #2: npm Dependencies Not Installed Before Deploy
+**Symptom:** Netlify build succeeded, but functions failed at runtime with `"Could not resolve 'googleapis'"`  
+**Root Cause:** `package.json` was not created during initial project setup; functions had no bundled dependencies  
+**Impact:** API returned 500 errors on first deploy  
+**Resolution:** 
+1. Created `package.json` with required dependencies: `googleapis`, `google-auth-library`
+2. Ran `npm install` locally to generate `package-lock.json`
+3. Committed both files to git
+4. Redeployed → functions bundled successfully  
+**Lesson:** Netlify Functions MUST have `package.json` + `package-lock.json` in the repository root, and dependencies must be installed before the build. The `netlify.toml` build command (`npm run build`) only builds TypeScript, not Node dependencies.
+
+#### Problem #3: Deployed Functions Cached Before Redeployment
+**Symptom:** First deploy succeeded, but API still returned `unauthorized_client` error  
+**Root Cause:** Netlify was serving cached function bytecode from the previous failed build. New env vars weren't picked up.  
+**Impact:** Blocking production issue: API appeared broken even though env vars were correct  
+**Resolution:** Used `netlify deploy --prod --skip-functions-cache` flag to force Netlify to clear function cache and rebuild from source  
+**Lesson:** After deploying env var changes or function code updates, always use `--skip-functions-cache` to ensure Netlify rebuilds, doesn't serve stale versions.
+
+#### Problem #4: Google Calendar API Not Enabled in Cloud Project
+**Symptom:** All auth steps completed successfully, but API returned `{"error": "unauthorized_client"}`  
+**Root Cause:** Google OAuth credentials were created, but the Calendar API itself was NOT enabled in the Google Cloud project. The error message `unauthorized_client` doesn't explicitly say "API not enabled"—it's a generic OAuth error that masks the real issue.  
+**Impact:** Major blocker: took 45+ minutes to debug because the error didn't indicate the root cause  
+**Resolution:** Manually enabled Google Calendar API in Google Cloud Console (1 click: APIs & Services > Enabled APIs & Services > Enable Calendar API)  
+**Lesson:** "Unauthorized_client" errors are ambiguous. When you see this error:
+1. First: verify the API you're calling is actually enabled in the Cloud project
+2. Second: verify the service account/OAuth credentials have permission to that API
+3. Third: check env vars and token freshness
+The real issue was often #1, but it looks like an auth failure.
+
+### 🔧 Code Changes Summary
+
+**Files Created:**
+- `.env` — Environment variables (not committed to git, exists on dev machine + Netlify)
+- `package.json` + `package-lock.json` — Node.js dependencies
+- `get-refresh-token.mjs` — OAuth automation script (temporary, deleted after use)
+
+**Files Modified:**
+- `netlify/functions/availability.ts` — No changes (already optimized in prior session)
+- `netlify/functions/book.ts` — No changes
+- `netlify.toml` — No changes
+
+**Cleanup:**
+- Deleted `get-refresh-token.mjs` (temporary OAuth script with hardcoded secrets)
+- Deleted `.refresh_token.txt` (temporary token file)
+
+### 📋 Verification Checklist ✅
+
+```
+POST-DEPLOYMENT VERIFICATION:
+✅ Google Calendar API enabled in Cloud project
+✅ OAuth client ID and secret valid
+✅ Refresh token obtained and configured on Netlify
+✅ npm dependencies installed and locked
+✅ Functions deployed without errors
+✅ /api/availability returns 200 OK with available slots
+✅ Slots include correct timezone offset (9 AM ET = 1 PM UTC)
+✅ Next available slot is in the future (no past slots)
+✅ Maximum 20 slots returned (as per spec)
+✅ Booking widget ready for embedding
+```
+
+---
+
 ## [May 3, 2026] API Fixes Complete — 502 Timeout & Timezone Issues Resolved
 
-**Status:** ✅ **PRODUCTION READY** — API fully functional, all slots displaying correctly  
+**Status:** ✅ **API WORKING** — All business logic complete, waiting on OAuth deployment  
 **Commits:** 8a4419a (Fix availability function + redact credentials from docs)  
 **Time spent:** ~45 minutes (debugging) + 30 minutes (cleanup & documentation)
 
