@@ -225,7 +225,7 @@
     const textColor = isDark ? '#ffffff' : '#000000';
     const borderColor = isDark ? '#333333' : '#dddddd';
     const accentColor = '#f5a623';
-    const hoverColor = isDark ? '#2a2a2a' : '#f9f9f9';
+    const hoverColor = '#ffffff';
 
     const styles = `
       .booking-widget {
