@@ -137,6 +137,7 @@ export const handler = async (event: any): Promise<any> => {
       body: JSON.stringify({
         success: false,
         error: 'Failed to create booking',
+        detail: error.message,
       } as BookingResponse),
     };
   }
