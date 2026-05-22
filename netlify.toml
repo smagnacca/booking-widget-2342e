@@ -26,14 +26,11 @@
     "Access-Control-Allow-Origin" = "*"
     "Cache-Control" = "public, max-age=3600"
 
-# Environment variables for Deploy with Netlify button
-[env.production]
-  GOOGLE_CLIENT_ID = ""
-  GOOGLE_CLIENT_SECRET = ""
-  GOOGLE_REFRESH_TOKEN = ""
+# Non-sensitive defaults only — credentials are set via Netlify UI env vars
+[env]
   GOOGLE_CALENDAR_ID = "scott.magnacca1@gmail.com"
   CALENDAR_TIMEZONE = "America/New_York"
-  RESEND_API_KEY = ""
   CONFIRMATION_EMAIL_FROM = "bookings@book.scottmagnacca.com"
   WIDGET_HOST = "https://book.scottmagnacca.com"
   MAX_ADVANCE_DAYS = "30"
+  BOOKING_BUFFER_MINUTES = "15"
