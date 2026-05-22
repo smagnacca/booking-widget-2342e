@@ -39,6 +39,15 @@ export const handler = async (event: any): Promise<any> => {
     const meetingDuration = parseInt(meetingType);
     const maxDays = parseInt(process.env.MAX_ADVANCE_DAYS || '30');
 
+    console.log('DEBUG ENV CHECK:', {
+      hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+      hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+      hasRefreshToken: !!process.env.GOOGLE_REFRESH_TOKEN,
+      clientIdPrefix: (process.env.GOOGLE_CLIENT_ID || '').slice(0, 20),
+      secretPrefix: (process.env.GOOGLE_CLIENT_SECRET || '').slice(0, 10),
+      tokenPrefix: (process.env.GOOGLE_REFRESH_TOKEN || '').slice(0, 10),
+    });
+
     const oauth2Client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET
