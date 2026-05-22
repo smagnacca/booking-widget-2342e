@@ -2,6 +2,71 @@
 
 ---
 
+## [May 22, 2026 — Session 9] BOTH SITES FIXED — Two-Site Architecture Resolved + Rule 25 Installed
+
+**Status:** ✅ **FULLY WORKING** — Both `book.scottmagnacca.com` and `smagnacca-booking-widget.netlify.app` verified  
+**Commits:** `bb00f25` pushed to `main` (+ force-pushed to `booking-widget-2342e` and `booking-widget-4026c`)  
+**Verified:** Availability + booking + calendar event creation confirmed on both sites
+
+---
+
+### ROOT CAUSES (Two separate issues)
+
+**Issue 1 — Wrong site got the credentials**  
+All env vars this session were set on `smagnacca-booking-widget` (ID: `66df2900-4747-45e4-9cdd-98d55eeb316d`). The actual production site (`book.scottmagnacca.com`) runs on `cheery-buttercream-a392fb` (ID: `206f206e-cbbc-4488-98f3-ff603428d072`). The prior sessions' credentials were stale/expired on the correct site. Fix: used `PUT /api/v1/accounts/$ACCOUNT_ID/env/$KEY` to update credentials on the correct site.
+
+**Issue 2 — Old code on deployed repos (previously unknown)**  
+Both Netlify sites are linked to separate repos (`booking-widget-2342e` and `booking-widget-4026c`) that hadn't been updated since May 3. The old code had two bugs:
+1. `conferenceSolutionKey: { conferenceSolution: 'hangoutsMeet' }` → **wrong field name** (should be `type`)
+2. `await resend.emails.send(...)` not wrapped in try/catch → **email failure crashed entire booking**  
+Fix: force-pushed working `booking-widget` main to both repos, triggered builds.
+
+---
+
+### WHAT THE 75-MINUTE DEBUGGING SESSION TAUGHT (Rule 25)
+
+This session wasted 75 minutes making 6+ Netlify deploys to diagnose instead of running a local `node -e` test. The correct sequence was:
+1. Local `node -e` test with same credentials → SUCCESS (8 minutes)
+2. `netlify env:set` on correct site → done
+3. One deploy
+
+**A global mandatory diagnosis protocol (Rule 25) was installed** in `~/.claude/CLAUDE.md` and `~/.claude/GLOBAL-DIAGNOSIS-PROTOCOL.md`:  
+_Any bug → /plan → Ollama → local reproduction test → local validation → red-team → ONE deploy. Never "deploy and see."_
+
+---
+
+### VERIFIED WORKING (Both Sites)
+
+| Check | book.scottmagnacca.com | smagnacca-booking-widget.netlify.app |
+|---|---|---|
+| `/api/availability` | ✅ 20 slots returned | ✅ 20 slots returned |
+| `/api/book` | ✅ `{"success":true,"eventId":"..."}` | ✅ `{"success":true,"eventId":"..."}` |
+| Google Calendar event | ✅ Created and deleted (test) | ✅ Created and deleted (test) |
+
+---
+
+### ARCHITECTURE NOTE (Important for future sessions)
+
+There are **3 GitHub repos** for this project:
+- `smagnacca/booking-widget` — **canonical working repo**, where all edits should be made
+- `smagnacca/booking-widget-2342e` — linked to `cheery-buttercream-a392fb` (book.scottmagnacca.com)
+- `smagnacca/booking-widget-4026c` — linked to `smagnacca-booking-widget.netlify.app`
+
+**When making code changes:** edit `booking-widget`, then push to all three repos.  
+Future simplification: consider relinking both Netlify sites to `smagnacca/booking-widget` directly.
+
+**Env vars:** Both sites have all 10 vars set. Credentials matched to `capture-token.mjs` OAuth client (`515620367331-uqs337m00kaenq1dapc12io3d3rar04g`).
+
+---
+
+### FILES CHANGED
+
+- `netlify/functions/book.ts` — added `detail: error.message` to catch (consistent with availability.ts)
+- `package.json` — removed accidental `open` + `playwright` dev deps
+- `netlify/functions/availability.ts` — removed `_debug` block from catch
+
+---
+
 ## [May 4, 2026 — Session 5/8] WIDGET FINALLY WORKING — Root Cause Found, Verified End-to-End
 
 **Status:** ✅ **FULLY WORKING AND VERIFIED** — Slot selection, booking, Google Calendar event creation, confirmation screen all confirmed live  
